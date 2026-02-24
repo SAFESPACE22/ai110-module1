@@ -61,10 +61,12 @@ def classify_song(song: Song, profile: Dict[str, object]) -> str:
     """Return a mood label given a song and user profile."""
     energy = song.get("energy", 0)
     genre = song.get("genre", "")
+    # Fix: lowercase title so chill keyword matching works regardless of input case
     title = song.get("title", "").lower()
 
     hype_min_energy = profile.get("hype_min_energy", 7)
     chill_max_energy = profile.get("chill_max_energy", 3)
+    # Fix: normalize favorite_genre from profile so comparison is case-insensitive
     favorite_genre = normalize_genre(str(profile.get("favorite_genre", "")))
 
     hype_keywords = ["rock", "punk", "party"]
@@ -80,6 +82,7 @@ def classify_song(song: Song, profile: Dict[str, object]) -> str:
         or any(k in title for k in chill_keywords)
     )
 
+    # Fix: a song meeting both or neither criteria goes to Mixed
     if is_hype and not is_chill:
         return "Hype"
     if is_chill and not is_hype:
